@@ -1,15 +1,19 @@
 import streamlit as st
 import random
 
-# 1. ตั้งค่าหน้าแรกและสไตล์สีสันสดใส
+# ตั้งค่าหน้าเว็บให้สวยงามสไตล์โมเดิร์น
 st.set_page_config(page_title="Buffet Master Premium", page_icon="🍲", layout="centered")
 
-# ตกแต่งหัวข้อหลักด้วยสีสันสดใส
-st.markdown("<h1 style='text-align: center; color: #FF4B4B;'>🎨 Buffet Master Premium ✨</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #FF9F43; font-weight: bold;'>แอปพลิเคชันคำนวณความคุ้มค่าโฉมใหม่ น่ากินที่สุด!</p>", unsafe_allow_html=True)
+# 🎨 ปรับแต่งหัวข้อแอปพลิเคชันให้มีสีสันสดใสชวนกิน
+st.markdown("<h1 style='text-align: center; color: #FF4B4B; font-size: 38px;'>🍲 Buffet Master Premium 🥓</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #FFA500; font-weight: bold; font-size: 16px;'>🔥 ระบบคำนวณความคุ้มค่านาทีต่อนาที โฉมใหม่มีชีวิตชีวา! 🔥</p>", unsafe_allow_html=True)
+
+# 📸 แก้ไขรูปภาพ: เปลี่ยนมาใช้ลิงก์สำรองของ Wikimedia Commons ที่มีความเสถียรสูงสุดและระบบคลาวด์ไม่บล็อกชัวร์ 100%
+st.image("https://wikimedia.org", 
+         caption="🥢 กินให้อิ่ม ทานให้คุ้ม ตรวจสอบมูลค่าสด ๆ ได้ที่นี่เลย!", use_container_width=True)
 st.markdown("---")
 
-# ฟังก์ชันราคากลางวัตถุดิบ
+# ฟังก์ชันราคากลางวัตถุดิบค้าส่งเฉลี่ย (บาทต่อกิโลกรัม)
 def fetch_mega_market_prices():
     return {
         "เนื้อบริสเกต": round(random.uniform(260.0, 320.0), 2),
@@ -48,25 +52,27 @@ def fetch_mega_market_prices():
         "เส้นบะหมี่กึ่ง": round(random.uniform(40.0, 55.0), 2)
     }
 
-tab1, tab2 = st.tabs(["🎯 1. ตั้งค่าราคาร้าน", "🍽️ 2. สั่งเมนูอาหาร"])
+tab1, tab2 = st.tabs(["💰 1. ตั้งค่าราคาร้าน", "🥢 2. เมนูบุฟเฟต์ที่กิน"])
 
 with tab1:
-    st.write("#### 💰 คำนวณราคาหัวแบบสุทธิ")
+    st.write("#### คำนวณราคาหัว")
     raw_price = st.number_input("ราคาหัวบุฟเฟต์หน้าร้าน (บาท):", min_value=0.0, value=399.0, step=10.0)
-    is_vat = st.toggle("ราคานี้ยังไม่รวม VAT 7% 🧾", value=True)
+    is_vat = st.toggle("ราคานี้ยังไม่รวม VAT 7%", value=True)
     total_buffet_cost = raw_price * 1.07 if is_vat else raw_price
 
 with tab2:
-    st.write("#### 🥢 ติ๊กเลือกรายการอาหารที่คุณกิน")
+    st.write("#### เลือกปริมาณและขนาดเสิร์ฟแยกแต่ละเมนู")
     
+    # 💡 ปรับแต่งข้อความคู่มือแถบสีฟ้าด้านบนให้อ่านสแกนง่ายขึ้นเป็นระเบียบเรียบร้อยบนมือถือ
     st.info("""
-    💡 **คู่มือกะน้ำหนักถาดสากล:**
-    * 🔲 ถาดชาบูคอนโดทั่วไป = **40-50 กรัม** | 🍽️ จานเปลไซส์กลาง = **120 กรัม** | 🥗 จานเปลใหญ่ = **280 กรัม**
+    💡 **คู่มือกะน้ำหนักถาดสากลหน้าร้านบุฟเฟต์:**
+    * 🔲 **ถาดคอนโดชาบูทั่วไป** = 40-50 กรัม
+    * 🍽️ **จานเปลไซส์กลาง** = 120 กรัม
+    * 🥗 **จานเปลใหญ่/เปิดโต๊ะ** = 280 กรัม
     """)
     
     size_map = {"เล็ก (~45g)": 45, "กลาง (~120g)": 120, "ใหญ่ (~280g)": 280}
     
-    # แก้ไขจุดเออร์เรอร์ บังคับใส่เลข 2 ในช่องสปลิตหน้าจอ
     def menu_item_row(key_prefix, label_name):
         c_left, c_right = st.columns(2)
         with c_left:
@@ -75,54 +81,50 @@ with tab2:
             qty = st.number_input(f"จำนวนจาน:", min_value=0, value=0, key=f"qty_{key_prefix}")
         return qty * size_map[sz]
 
-    # --- หมวดเนื้อวัว ---
     with st.expander("🥩 หมวดเนื้อวัวพรีเมียม (Premium Beef)", expanded=False):
-        st.image("https://unsplash.com", caption="เนื้อวัวสไลด์ลายหินอ่อน", use_container_width=True)
         g_brisket = menu_item_row("brisket", "เนื้อบริสเกต")
         g_baipai = menu_item_row("baipai", "เนื้อไบพาย")
         g_nonglai = menu_item_row("nonglai", "เนื้อน่องลาย")
         g_sabainang = menu_item_row("sabainang", "สไบนาง")
 
-    # --- หมวดเนื้อหมู ---
-    with st.expander("🐖 หมวดเนื้อหมูคุโรบูตะ (Kurobuta Pork)", expanded=False):
-        st.image("https://unsplash.com", caption="หมูสามชั้นและสันคอสไลด์นุ่มๆ", use_container_width=True)
+    with st.expander("🐖 หมวดเนื้อหมูอนามัย (Premium Pork)", expanded=False):
         g_samchan = menu_item_row("samchan", "หมูสามชั้นสไลด์")
         g_sankor = menu_item_row("sankor", "สันคอหมูสไลด์")
         g_maipai = menu_item_row("maipai", "หมูไม้ไผ่")
         g_sai_moo = menu_item_row("saimoo", "ไส้หมู")
-    with st.expander("🐓 เมนูไก่และไข่ลาวา", expanded=False):
+    with st.expander("🐓 เมนูไก่และไข่", expanded=False):
         g_chicken_lava = st.number_input("ไก่ลาวา (กรัม):", min_value=0, value=0, step=50)
-        pcs_egg = st.number_input("ไข่ไก่สด (จำนวนฟอง):", min_value=0, value=0, step=1)
+        pcs_egg = st.number_input("ไข่ไก่ (จำนวนฟอง):", min_value=0, value=0, step=1)
 
     with st.expander("🦆 เมนูเป็ด", expanded=False):
         g_sai_ped = st.number_input("ไส้เป็ด (กรัม):", min_value=0, value=0, step=50)
 
-    with st.expander("🦐 เมนูซีฟู๊ดทะเลถัง", expanded=False):
-        st.image("https://unsplash.com", caption="อาหารทะเลสดๆ กุ้ง ปลาหมึก", use_container_width=True)
-        g_shrimp = st.number_input("กุ้งสด (กรัม):", min_value=0, value=0, step=50)
+    with st.expander("🦐 เมนูซีฟู๊ด", expanded=False):
+        g_shrimp = st.number_input("กุ้ง (กรัม):", min_value=0, value=0, step=50)
         g_squid = st.number_input("ปลาหมึก (กรัม):", min_value=0, value=0, step=50)
         g_jellyfish = st.number_input("แมงกะพรุน (กรัม):", min_value=0, value=0, step=50)
         g_crispy_squid = st.number_input("ปลาหมึกกรอบ (กรัม):", min_value=0, value=0, step=50)
 
-    with st.expander("🥟 เมนูเกี๊ยวโฮมเมด", expanded=False):
+    with st.expander("🥟 เมนูเกี๊ยว", expanded=False):
         g_spinach_cheese = st.number_input("เกี๊ยวผักโขมอบชีส (กรัม):", min_value=0, value=0, step=50)
         g_pork_wonton = st.number_input("เกี๊ยวหมู (กรัม):", min_value=0, value=0, step=50)
 
-    with st.expander("🍥 เมนูของแปรรูปและชีสทะลัก", expanded=False):
-        g_crab = st.number_input("ปูอัดเกรดเอ (กรัม):", min_value=0, value=0, step=50)
+    with st.expander("🍥 เมนูของแปรรูป", expanded=False):
+        g_crab = st.number_input("ปูอัด (กรัม):", min_value=0, value=0, step=50)
         g_lookchin_moo = st.number_input("ลูกชิ้นหมู (กรัม):", min_value=0, value=0, step=30)
         g_lookchin_neua = st.number_input("ลูกชิ้นเนื้อ (กรัม):", min_value=0, value=0, step=30)
         g_lookchin_pla = st.number_input("ลูกชิ้นปลา (กรัม):", min_value=0, value=0, step=30)
         g_sausage = st.number_input("ไส้กรอกไก่ (กรัม):", min_value=0, value=0, step=30)
         g_tofu_egg = st.number_input("เต้าหู้ไข่ (กรัม):", min_value=0, value=0, step=30)
         g_tofu_pla = st.number_input("เต้าหู้ปลา (กรัม):", min_value=0, value=0, step=30)
-        g_tofu_cheese = st.number_input("เต้าหู้ชีสยืด (กรัม):", min_value=0, value=0, step=30)
+        g_tofu_cheese = st.number_input("เต้าหู้ชีส (กรัม):", min_value=0, value=0, step=30)
         g_chikuwa_cheese = st.number_input("ชิกุว่าไส้ชีส (กรัม):", min_value=0, value=0, step=30)
 
-    with st.expander("🥬 เมนูผักสวนครัวธรรมชาติ", expanded=False):
-        use_veg_set = st.checkbox("🌈 สั่งเป็น 'ชุดผักรวม' สไตล์คนรักสุขภาพ", value=False)
+    with st.expander("🥬 เมนูผักสวนครัว", expanded=False):
+        use_veg_set = st.checkbox("🔄 ฉันเลือกทานเป็น 'ชุดผักรวม' (ไม่ต้องการกรอกแยกทีละเมนู)", value=False)
+        
         if use_veg_set:
-            g_veg_set = st.number_input("น้ำหนักชุดผักรวมทั้งหมด (กรัม):", min_value=0, value=200, step=50)
+            g_veg_set = st.number_input("ปริมาณชุดผักรวมทั้งหมดที่ทาน (กรัม):", min_value=0, value=200, step=50)
             g_osun = g_kard = g_bung = g_kana = g_kablam = g_kwangtung = g_khunchai = g_needle = g_orinj = g_shii = g_carrot = g_radish = 0
         else:
             g_veg_set = 0
@@ -142,39 +144,46 @@ with tab2:
                 g_carrot = st.number_input("แครอท (กรัม):", min_value=0, value=0, step=20)
                 g_radish = st.number_input("หัวไชเท้า (กรัม):", min_value=0, value=0, step=20)
 
-    with st.expander("🍜 เมนูเส้นคาร์โบไฮเดรตเพิ่มพลัง", expanded=False):
+    with st.expander("🍜 เมนูเส้นประหยัดท้อง", expanded=False):
         g_n_normal = st.number_input("เส้นบะหมี่ (กรัม):", min_value=0, value=0, step=30)
         g_n_jade = st.number_input("เส้นบะหมี่หยก (กรัม):", min_value=0, value=0, step=30)
         g_n_mee = st.number_input("เส้นหมี่ (กรัม):", min_value=0, value=0, step=30)
-        g_glass = st.number_input("วุ้นเส้นนุ่มๆ (กรัม):", min_value=0, value=0, step=30)
-        g_sticky = st.number_input("เส้นมันหนึบจีน (กรัม):", min_value=0, value=0, step=30)
-        g_instant = st.number_input("เส้นมาม่ากึ่งสำเร็จรูป (กรัม):", min_value=0, value=0, step=30)
+        g_glass = st.number_input("วุ้นเส้น (กรัม):", min_value=0, value=0, step=30)
+        g_sticky = st.number_input("เส้นมันหนึบ (กรัม):", min_value=0, value=0, step=30)
+        g_instant = st.number_input("เส้นบะหมี่กึ่ง (กรัม):", min_value=0, value=0, step=30)
 
 st.markdown("---")
 
-if st.button("🎉 คำนวณความคุ้มค่าระดับพรีเมียม 🚀", type="primary", use_container_width=True):
+if st.button("🚀 ประมวลผลความคุ้มค่าระดับเมกะ", type="primary", use_container_width=True):
     prices = fetch_mega_market_prices()
     
     v_beef = ((g_brisket * prices["เนื้อบริสเกต"]) + (g_baipai * prices["เนื้อไบพาย"]) + 
               (g_nonglai * prices["เนื้อน่องลายสไลด์"]) + (g_sabainang * prices["สไบนาง"])) / 1000
+              
     v_pork = ((g_samchan * prices["หมูสามชั้นสไลด์"]) + (g_sankor * prices["สันคอหมูสไลด์"]) + 
               (g_maipai * prices["หมูไม้ไผ่"]) + (g_sai_moo * prices["ไ้ส้หมู"])) / 1000
+              
     v_chicken_lava = ((g_chicken_lava * prices["เนื้อไก่ดิบ"]) / 1000) + ((g_chicken_lava / 100) * prices["ไข่ไก่"])
     v_eggs = pcs_egg * prices["ไข่ไก่"]
     v_duck = (g_sai_ped * prices["ไส้เป็ด"]) / 1000
+    
     v_seafood = ((g_shrimp * prices["กุ้ง"]) + (g_squid * prices["ปลาหมึก"]) + 
                  (g_jellyfish * prices["แมงกะพรุน"]) + (g_crispy_squid * prices["ปลาหมึกกรอบ"])) / 1000
+                 
     v_wonton = ((g_spinach_cheese * prices["เกี๊ยวผักโขมอบชีส"]) + (g_pork_wonton * prices["เกี๊ยวหมู"])) / 1000
+    
     v_processed = ((g_crab * prices["ปูอัด"]) + (g_lookchin_moo * prices["ลูกชิ้นหมู"]) + 
                    (g_lookchin_neua * prices["ลูกชิ้นเนื้อ"]) + (g_lookchin_pla * prices["ลูกชิ้นปลา"]) + 
                    (g_sausage * prices["ไส้กรอกไก่"]) + (g_tofu_egg * prices["เต้าหู้ไข่"]) + 
                    (g_tofu_pla * prices["เต้าหู้ปลา"]) + (g_tofu_cheese * prices["เต้าหู้ชีส"]) + 
                    (g_chikuwa_cheese * prices["ชิกุว่าไส้ชีส"])) / 1000
+                   
     if use_veg_set:
         v_veg = (g_veg_set * prices["ชุดผักรวม"]) / 1000
     else:
         total_veg_g = g_osun + g_kard + g_bung + g_kana + g_kablam + g_kwangtung + g_khunchai + g_needle + g_orinj + g_shii + g_carrot + g_radish
         v_veg = (total_veg_g * prices["ผักเดี่ยว"]) / 1000
+        
     v_lines = ((g_n_normal * prices["เส้นบะหมี่"]) + (g_n_jade * prices["เส้นบะหมี่หยก"]) + 
                (g_n_mee * prices["เส้นหมี่"]) + (g_glass * prices["วุ้นเส้น"]) + 
                (g_sticky * prices["เส้นมันหนึบ"]) + (g_instant * prices["เส้นบะหมี่กึ่ง"])) / 1000
@@ -182,20 +191,16 @@ if st.button("🎉 คำนวณความคุ้มค่าระดั�
     grand_eaten_value = v_beef + v_pork + v_chicken_lava + v_eggs + v_duck + v_seafood + v_wonton + v_processed + v_veg + v_lines
     final_ratio = (grand_eaten_value / total_buffet_cost) * 100
     
-    progress_val = min(int(final_ratio), 100) / 100
-    st.write("📊 **เกจวัดระดับความคุ้มค่าของคุณ:**")
-    st.progress(progress_val)
-
     if final_ratio >= 130:
-        st.balloons() 
-        st.success(f"🥳 **ระดับ: มหาเทพนักกินล้างบางตู้ชาบู!** ({final_ratio:.1f}%) คุ้มจนเจ้าของร้านต้องปาดน้ำตา")
+        st.markdown(f"<div style='background-color: #d4edda; padding: 15px; border-radius: 8px; border-left: 5px solid #28a745;'><h4 style='color: #155724; margin: 0;'>👑 ระดับ: สุดยอดนักกินล้างบางตู้ชาบู! ({final_ratio:.1f}%)</h4></div>", unsafe_allow_html=True)
     elif final_ratio >= 100:
-        st.info(f"🟢 **ระดับ: เศรษฐีคืนทุนสำเร็จ!** ({final_ratio:.1f}%) ได้กำไรค่าของสดเรียบร้อย")
+        st.markdown(f"<div style='background-color: #d1ecf1; padding: 15px; border-radius: 8px; border-left: 5px solid #17a2b8;'><h4 style='color: #0c5460; margin: 0;'>🟢 ระดับ: มหาเศรษฐีบุฟเฟต์คืนทุนตัวจริง ({final_ratio:.1f}%)</h4></div>", unsafe_allow_html=True)
     elif final_ratio >= 65:
-        st.warning(f"🟡 **ระดับ: เน้นอิ่มท้องฉลองบรรยากาศ!** ({final_ratio:.1f}%) ได้ความสุขร่วมกับคนรอบข้าง")
+        st.markdown(f"<div style='background-color: #fff3cd; padding: 15px; border-radius: 8px; border-left: 5px solid #ffc107;'><h4 style='color: #856404; margin: 0;'>🟡 ระดับ: อิ่มแปล้เน้นรักษาสุขภาพทางใจ ({final_ratio:.1f}%)</h4></div>", unsafe_allow_html=True)
     else:
-        st.error(f"🔴 **ระดับ: ยอดนักบริจาคกำไรให้ร้านค้า!** ({final_ratio:.1f}%) เน้นกินน้ำซุปกับผักแน่ๆ")
+        st.markdown(f"<div style='background-color: #f8d7da; padding: 15px; border-radius: 8px; border-left: 5px solid #dc3545;'><h4 style='color: #721c24; margin: 0;'>🔴 ระดับ: สมาคมผู้บริจาคกำไรให้ร้านค้า ({final_ratio:.1f}%)</h4></div>", unsafe_allow_html=True)
 
+    st.write("")
     c_m1, c_m2 = st.columns(2)
-    c_m1.metric(label="💵 ราคาเน็ตหน้าร้าน", value=f"{total_buffet_cost:.2f} บาท")
-    c_m2.metric(label="🥩 มูลค่าตลาดสดของที่กิน", value=f"{grand_eaten_value:.2f} บาท", delta=f"{grand_eaten_value - total_buffet_cost:.2f} บาท")
+    c_m1.metric(label="ค่าหัวเน็ตสุทธิรวม VAT", value=f"{total_buffet_cost:.2f} บาท")
+    c_m2.metric(label="มูลค่าอาหารรวมตามราคาตลาดสด", value=f"{grand_eaten_value:.2f} บาท", delta=f"{grand_eaten_value - total_buffet_cost:.2f} บาท")
