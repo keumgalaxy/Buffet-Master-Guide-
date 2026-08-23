@@ -2,13 +2,13 @@ import streamlit as st
 import random
 
 # ตั้งค่าหน้าเว็บสไตล์โมเดิร์น
-st.set_page_config(page_title="Buffet Guide Calculator", page_icon="🍲", layout="centered")
+st.set_page_config(page_title="Buffet Pro Ultimate", page_icon="🍲", layout="centered")
 
-st.markdown("<h1 style='text-align: center; color: #FF4B4B;'>🍲 Buffet Master Guide 🥓</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #666666;'>เครื่องคำนวณความคุ้มค่าระบบอัจฉริยะ แปลงจำนวนถาดเป็นน้ำหนักกรัมอัตโนมัติ</p>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #FF4B4B;'>🍲 Buffet Master Ultimate 🥓</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #666666;'>ระบบคำนวณความคุ้มค่าแบบแยกขนาดจานอิสระรายเมนู อัปเดตปี 2026</p>", unsafe_allow_html=True)
 st.markdown("---")
 
-# ฟังก์ชันราคากลางวัตถุดิบค้าส่งเฉลี่ยปี 2026 (บาทต่อกิโลกรัม)
+# ฟังก์ชันราคากลางวัตถุดิบค้าส่งเฉลี่ย (บาทต่อกิโลกรัม)
 def fetch_mega_market_prices():
     return {
         "เนื้อบริสเกต": round(random.uniform(260.0, 320.0), 2),
@@ -56,39 +56,33 @@ with tab1:
     total_buffet_cost = raw_price * 1.07 if is_vat else raw_price
 
 with tab2:
-    st.write("#### เลือกรายการอาหารที่ทานจริง")
-    st.info("💡 แถบไกด์ไลน์: ตัวระบบเปิดโหมดคำนวณตามจำนวนถาด/จานให้อัตโนมัติ")
+    st.write("#### เลือกปริมาณและขนาดเสิร์ฟแยกแต่ละเมนู")
     
-    # --- ระบบคำนวณน้ำหนักเนื้อวัวตามขนาดจาน ---
-    with st.expander("🥩 หมวดเนื้อวัว (ระบบคำนวณตามขนาดเสิร์ฟ)", expanded=False):
-        size_beef = st.radio("เลือกขนาดจานเนื้อวัวของร้านที่คุณทาน:", ["เล็ก (คอนโดชาบู ~45g)", "กลาง (จานเปล ~120g)", "ใหญ่ (จานพูน ~280g)"], horizontal=True)
-        weight_multiplier_beef = 45 if "เล็ก" in size_beef else (120 if "กลาง" in size_beef else 280)
-        
-        plates_brisket = st.number_input("เนื้อบริสเกต (จำนวนถาด/จาน):", min_value=0, value=0)
-        plates_baipai = st.number_input("เนื้อไบพาย (จำนวนถาด/จาน):", min_value=0, value=0)
-        plates_nonglai = st.number_input("เนื้อน่องลายสไลด์ (จำนวนถาด/จาน):", min_value=0, value=0)
-        plates_sabainang = st.number_input("สไบนาง (จำนวนถาด/จาน):", min_value=0, value=0)
-        
-        g_brisket = plates_brisket * weight_multiplier_beef
-        g_baipai = plates_baipai * weight_multiplier_beef
-        g_nonglai = plates_nonglai * weight_multiplier_beef
-        g_sabainang = plates_sabainang * weight_multiplier_beef
+    # ตัวแปลงขนาดจานเป็นกรัมสากล
+    size_map = {"เล็ก (~45g)": 45, "กลาง (~120g)": 120, "ใหญ่ (~280g)": 280}
+    
+    # ฟังก์ชันผู้ช่วยสร้างช่องกรอกข้อมูลแบบแยกคอลัมน์อิสระ
+    def menu_item_row(key_prefix, label_name):
+        c_left, c_right = st.columns([3, 2])
+        with c_left:
+            sz = st.selectbox(f"ขนาดจาน {label_name}:", ["เล็ก (~45g)", "กลาง (~120g)", "ใหญ่ (~280g)"], key=f"sz_{key_prefix}")
+        with c_right:
+            qty = st.number_input(f"จำนวนจาน:", min_value=0, value=0, key=f"qty_{key_prefix}")
+        return qty * size_map[sz]
 
-    # --- ระบบคำนวณน้ำหนักเนื้อหมูตามขนาดจาน ---
-    with st.expander("🐖 หมวดเนื้อหมู (ระบบคำนวณตามขนาดเสิร์ฟ)", expanded=False):
-        size_pork = st.radio("เลือกขนาดจานเนื้อหมูของร้านที่คุณทาน:", ["เล็ก (คอนโดชาบู ~45g)", "กลาง (จานเปล ~120g)", "ใหญ่ (จานพูน ~280g)"], horizontal=True)
-        weight_multiplier_pork = 45 if "เล็ก" in size_pork else (120 if "กลาง" in size_pork else 280)
-        
-        plates_samchan = st.number_input("หมูสามชั้นสไลด์ (จำนวนถาด/จาน):", min_value=0, value=0)
-        plates_sankor = st.number_input("สันคอหมูสไลด์ (จำนวนถาด/จาน):", min_value=0, value=0)
-        plates_maipai = st.number_input("หมูไม้ไผ่ (จำนวนถาด/จาน):", min_value=0, value=0)
-        plates_sai_moo = st.number_input("ไส้หมู (จำนวนถาด/จาน):", min_value=0, value=0)
-        
-        g_samchan = plates_samchan * weight_multiplier_pork
-        g_sankor = plates_sankor * weight_multiplier_pork
-        g_maipai = plates_maipai * weight_multiplier_pork
-        g_sai_moo = plates_sai_moo * weight_multiplier_pork
+    # --- หมวดเนื้อวัว ---
+    with st.expander("🥩 หมวดเนื้อวัว (แยกขนาดจานได้อิสระ)", expanded=False):
+        g_brisket = menu_item_row("brisket", "เนื้อบริสเกต")
+        g_baipai = menu_item_row("baipai", "เนื้อไบพาย")
+        g_nonglai = menu_item_row("nonglai", "เนื้อน่องลาย")
+        g_sabainang = menu_item_row("sabainang", "สไบนาง")
 
+    # --- หมวดเนื้อหมู ---
+    with st.expander("🐖 หมวดเนื้อหมู (แยกขนาดจานได้อิสระ)", expanded=False):
+        g_samchan = menu_item_row("samchan", "หมูสามชั้นสไลด์")
+        g_sankor = menu_item_row("sankor", "สันคอหมูสไลด์")
+        g_maipai = menu_item_row("maipai", "หมูไม้ไผ่")
+        g_sai_moo = menu_item_row("saimoo", "ไส้หมู")
     with st.expander("🐓 เมนูไก่และไข่", expanded=False):
         g_chicken_lava = st.number_input("ไก่ลาวา (กรัม):", min_value=0, value=0, step=50)
         pcs_egg = st.number_input("ไข่ไก่ (จำนวนฟอง):", min_value=0, value=0, step=1)
@@ -101,6 +95,7 @@ with tab2:
         g_squid = st.number_input("ปลาหมึก (กรัม):", min_value=0, value=0, step=50)
         g_jellyfish = st.number_input("แมงกะพรุน (กรัม):", min_value=0, value=0, step=50)
         g_crispy_squid = st.number_input("ปลาหมึกกรอบ (กรัม):", min_value=0, value=0, step=50)
+
     with st.expander("🥟 เมนูเกี๊ยว", expanded=False):
         g_spinach_cheese = st.number_input("เกี๊ยวผักโขมอบชีส (กรัม):", min_value=0, value=0, step=50)
         g_pork_wonton = st.number_input("เกี๊ยวหมู (กรัม):", min_value=0, value=0, step=50)
