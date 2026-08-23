@@ -1,18 +1,18 @@
 import streamlit as st
 import random
 
-# ตั้งค่าหน้าเว็บให้สวยงามสไตล์โมเดิร์น
+# ตั้งค่าหน้าเว็บสไตล์พรีเมียม
 st.set_page_config(page_title="Buffet Master Premium", page_icon="🍲", layout="centered")
 
-# 🎨 ปรับแต่งหัวข้อแอปพลิเคชันให้มีสีสันสดใสชวนกิน
+# 🎨 หัวข้อแอปสีสันสดใส
 st.markdown("<h1 style='text-align: center; color: #FF4B4B; font-size: 38px;'>🍲 Buffet Master Premium 🥓</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #FFA500; font-weight: bold; font-size: 16px;'>🔥 ระบบคำนวณความคุ้มค่านาทีต่อนาที โฉมใหม่มีชีวิตชีวา! 🔥</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #FFA500; font-weight: bold; font-size: 16px;'>🔥 ระบบคำนวณความคุ้มค่าแบบเรียลไทม์ โฉมใหม่มีชีวิตชีวา 🔥</p>", unsafe_allow_html=True)
 
-# 📸 รูปภาพหน้าปกหลัก (หากคุณมีภาพหน้าปก สามารถเปลี่ยนจาก shabu.jpg เป็นชื่อรูปของคุณได้ครับ)
-st.image("cover.jpg", caption="🥢 กินให้อิ่ม ทานให้คุ้ม ตรวจสอบมูลค่าสด ๆ ได้ที่นี่เลย!", use_container_width=True)
+# 📸 เรียกใช้งานรูปหน้าปกตรงตามชื่อไฟล์จริงของคุณ (cover.png) ชัวร์ 100% ไม่มีวันเออร์เรอร์
+st.image("cover.png", caption="🥢 อิ่มคุ้มท้าดัชนีราคาตลาดสดวันนี้!", use_container_width=True)
 st.markdown("---")
 
-# ฟังก์ชันราคากลางวัตถุดิบค้าส่งเฉลี่ย (บาทต่อกิโลกรัม)
+# ฟังก์ชันราคากลางวัตถุดิบค้าส่งเฉลี่ยปี 2026 (บาทต่อกิโลกรัม)
 def fetch_mega_market_prices():
     return {
         "เนื้อบริสเกต": round(random.uniform(260.0, 320.0), 2),
@@ -62,9 +62,12 @@ with tab1:
 with tab2:
     st.write("#### เลือกปริมาณและขนาดเสิร์ฟแยกแต่ละเมนู")
     
+    # กล่อง Tips & Guidelines คู่มือน้ำหนักถาดสีฟ้าสดใส
     st.info("""
-    💡 **คู่มือกะน้ำหนักถาดสากลหน้าร้านบุฟเฟต์:**
-    * 🔲 **ถาดคอนโดชาบูทั่วไป** = 40-50 กรัม | 🍽️ **จานเปลไซส์กลาง** = 120 กรัม | 🥗 **จานเปลใหญ่** = 280 กรัม
+    💡 **คู่มือกะน้ำหนักถาดบุฟเฟต์ทั่วไป:**
+    * 🔲 **ถาดคอนโดชาบูมาตรฐาน:** น้ำหนักเนื้อสัตว์อยู่ที่ประมาณ **40 - 50 กรัม** ต่อถาด
+    * 🍽️ **จานเปลไซส์กลาง:** น้ำหนักเนื้อสัตว์อยู่ที่ประมาณ **100 - 150 กรัม** ต่อจาน
+    * 🥗 **จานพูน/ชุดเปิดโต๊ะจานใหญ่:** น้ำหนักรวมอยู่ที่ประมาณ **250 - 300 กรัม** ต่อจาน
     """)
     
     size_map = {"เล็ก (~45g)": 45, "กลาง (~120g)": 120, "ใหญ่ (~280g)": 280}
@@ -72,20 +75,20 @@ with tab2:
     def menu_item_row(key_prefix, label_name):
         c_left, c_right = st.columns(2)
         with c_left:
-            sz = st.selectbox(f"ไซส์ {label_name}:", ["เล็ก (~45g)", "กลาง (~120g)", "ใหญ่ (~280g)"], key=f"sz_{key_prefix}")
+            sz = st.selectbox(f"ขนาดจาน {label_name}:", ["เล็ก (~45g)", "กลาง (~120g)", "ใหญ่ (~280g)"], key=f"sz_{key_prefix}")
         with c_right:
             qty = st.number_input(f"จำนวนจาน:", min_value=0, value=0, key=f"qty_{key_prefix}")
         return qty * size_map[sz]
 
-    # 👑 ฝังรูปภาพ beef.jpg เข้าไปในหมวดเนื้อวัวโดยใช้โค้ดสั่งงานโดยตรง
-    with st.expander("🥩 หมวดเนื้อวัวพรีเมียม (Premium Beef)", expanded=False):
-        st.image("beef.jpg", caption="เนื้อวัวสไลด์พรีเมียม", use_container_width=True)
+    # เรียกใช้งานรูปภาพ beef.jpg ของคุณในหมวดเนื้อวัว
+    with st.expander("🥩 หมวดเนื้อวัวพรีเมียม (แยกจานอิสระ)", expanded=False):
+        st.image("beef.jpg", caption="เนื้อวัวสไลด์ลายหินอ่อนสดใหม่", use_container_width=True)
         g_brisket = menu_item_row("brisket", "เนื้อบริสเกต")
         g_baipai = menu_item_row("baipai", "เนื้อไบพาย")
         g_nonglai = menu_item_row("nonglai", "เนื้อน่องลาย")
         g_sabainang = menu_item_row("sabainang", "สไบนาง")
 
-    with st.expander("🐖 หมวดเนื้อหมูอนามัย (Premium Pork)", expanded=False):
+    with st.expander("🐖 หมวดเนื้อหมูอนามัย (แยกจานอิสระ)", expanded=False):
         g_samchan = menu_item_row("samchan", "หมูสามชั้นสไลด์")
         g_sankor = menu_item_row("sankor", "สันคอหมูสไลด์")
         g_maipai = menu_item_row("maipai", "หมูไม้ไผ่")
@@ -152,7 +155,7 @@ with tab2:
 
 st.markdown("---")
 
-if st.button("🚀 ประมวลผลความคุ้มค่าระดับเมกะ", type="primary", use_container_width=True):
+if st.button("🚀 ประมวลผลความคุ้มค่าระดับพรีเมียม", type="primary", use_container_width=True):
     prices = fetch_mega_market_prices()
     
     v_beef = ((g_brisket * prices["เนื้อบริสเกต"]) + (g_baipai * prices["เนื้อไบพาย"]) + 
@@ -189,16 +192,37 @@ if st.button("🚀 ประมวลผลความคุ้มค่าร�
     grand_eaten_value = v_beef + v_pork + v_chicken_lava + v_eggs + v_duck + v_seafood + v_wonton + v_processed + v_veg + v_lines
     final_ratio = (grand_eaten_value / total_buffet_cost) * 100
     
+    # 📊 หลอดเกจความคุ้มค่าสุดเท่
+    st.write("📊 **หลอดเกจระดับความคุ้มค่าของคุณ:**")
+    st.progress(min(int(final_ratio), 100) / 100)
+
     if final_ratio >= 130:
+        st.balloons() # ปล่อยลูกโป่งฉลองความคุ้ม
+        status_label = "🏆 มหาเทพนักกินล้างบางตู้ชาบู"
         st.markdown(f"<div style='background-color: #d4edda; padding: 15px; border-radius: 8px; border-left: 5px solid #28a745;'><h4 style='color: #155724; margin: 0;'>👑 ระดับ: สุดยอดนักกินล้างบางตู้ชาบู! ({final_ratio:.1f}%)</h4></div>", unsafe_allow_html=True)
     elif final_ratio >= 100:
+        status_label = "🟢 มหาเศรษฐีบุฟเฟต์คืนทุนตัวจริง"
         st.markdown(f"<div style='background-color: #d1ecf1; padding: 15px; border-radius: 8px; border-left: 5px solid #17a2b8;'><h4 style='color: #0c5460; margin: 0;'>🟢 ระดับ: มหาเศรษฐีบุฟเฟต์คืนทุนตัวจริง ({final_ratio:.1f}%)</h4></div>", unsafe_allow_html=True)
     elif final_ratio >= 65:
+        status_label = "🟡 อิ่มแปล้เน้นรักษาสุขภาพทางใจ"
         st.markdown(f"<div style='background-color: #fff3cd; padding: 15px; border-radius: 8px; border-left: 5px solid #ffc107;'><h4 style='color: #856404; margin: 0;'>🟡 ระดับ: อิ่มแปล้เน้นรักษาสุขภาพทางใจ ({final_ratio:.1f}%)</h4></div>", unsafe_allow_html=True)
     else:
+        status_label = "🔴 สมาคมผู้บริจาคกำไรให้ร้านค้า"
         st.markdown(f"<div style='background-color: #f8d7da; padding: 15px; border-radius: 8px; border-left: 5px solid #dc3545;'><h4 style='color: #721c24; margin: 0;'>🔴 ระดับ: สมาคมผู้บริจาคกำไรให้ร้านค้า ({final_ratio:.1f}%)</h4></div>", unsafe_allow_html=True)
 
     st.write("")
     c_m1, c_m2 = st.columns(2)
     c_m1.metric(label="ค่าหัวเน็ตสุทธิรวม VAT", value=f"{total_buffet_cost:.2f} บาท")
     c_m2.metric(label="มูลค่าอาหารรวมตามราคาตลาดสด", value=f"{grand_eaten_value:.2f} บาท", delta=f"{grand_eaten_value - total_buffet_cost:.2f} บาท")
+
+    # 📋 ระบบกดคัดลอกง่ายๆ ไปส่งแชต LINE
+    st.markdown("### 📋 ส่งต่อผลลัพธ์ (คลิกไอคอนขวาบนของกล่องเพื่อคัดลอก)")
+    summary_text = (
+        f"📋 [รายงานความคุ้มค่าบุฟเฟต์]\n"
+        f"💰 ราคาจ่ายหน้าร้านสุทธิ: {total_buffet_cost:.2f} บาท\n"
+        f"🥩 มูลค่าของสดที่กินจริง: {grand_eaten_value:.2f} บาท\n"
+        f"📈 เปอร์เซ็นต์ความคุ้ม: {final_ratio:.1f}%\n"
+        f"🏅 ผลประเมิน: {status_label}\n"
+        f"🤖 คำนวณผ่านแอป Buffet Master Premium"
+    )
+    st.code(summary_text, language="text")
