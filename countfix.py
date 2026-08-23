@@ -9,7 +9,7 @@ st.markdown("<h1 style='text-align: center; color: #FF4B4B; font-size: 38px;'>�
 st.markdown("<p style='text-align: center; color: #FFA500; font-weight: bold; font-size: 16px;'>🔥 ระบบคำนวณความคุ้มค่านาทีต่อนาที โฉมใหม่มีชีวิตชีวา! 🔥</p>", unsafe_allow_html=True)
 
 # 📸 รูปภาพหน้าปกหลัก (หากคุณมีภาพหน้าปก สามารถเปลี่ยนจาก shabu.jpg เป็นชื่อรูปของคุณได้ครับ)
-st.image("shabu.jpg", caption="🥢 กินให้อิ่ม ทานให้คุ้ม ตรวจสอบมูลค่าสด ๆ ได้ที่นี่เลย!", use_container_width=True)
+st.image("cover.jpg", caption="🥢 กินให้อิ่ม ทานให้คุ้ม ตรวจสอบมูลค่าสด ๆ ได้ที่นี่เลย!", use_container_width=True)
 st.markdown("---")
 
 # ฟังก์ชันราคากลางวัตถุดิบค้าส่งเฉลี่ย (บาทต่อกิโลกรัม)
