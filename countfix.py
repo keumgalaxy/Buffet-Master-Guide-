@@ -1,11 +1,16 @@
 import streamlit as st
 import random
 
-# ตั้งค่าหน้าเว็บสไตล์โมเดิร์น
-st.set_page_config(page_title="Buffet Pro Ultimate", page_icon="🍲", layout="centered")
+# ตั้งค่าหน้าเว็บให้สวยงามสไตล์โมเดิร์น
+st.set_page_config(page_title="Buffet Master Premium", page_icon="🍲", layout="centered")
 
-st.markdown("<h1 style='text-align: center; color: #FF4B4B;'>🍲 Buffet Master Ultimate 🥓</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #666666;'>ระบบคำนวณความคุ้มค่าแบบแยกขนาดจานอิสระรายเมนู อัปเดตปี 2026</p>", unsafe_allow_html=True)
+# 🎨 1. ปรับแต่งหัวข้อแอปพลิเคชันให้มีสีสันสดใสชวนกิน
+st.markdown("<h1 style='text-align: center; color: #FF4B4B; font-size: 38px;'>🍲 Buffet Master Premium 🥓</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #FFA500; font-weight: bold; font-size: 16px;'>🔥 ระบบคำนวณความคุ้มค่านาทีต่อนาที โฉมใหม่มีชีวิตชีวา! 🔥</p>", unsafe_allow_html=True)
+
+# 📸 2. ใส่รูปภาพหน้าปกหม้อชาบูชาบูบุฟเฟต์ดึงดูดสายตาจากลิงก์สากล
+st.image("https://unsplash.com", 
+         caption="🥢 กินให้อิ่ม ทานให้คุ้ม ตรวจสอบมูลค่าสด ๆ ได้ที่นี่เลย!", use_container_width=True)
 st.markdown("---")
 
 # ฟังก์ชันราคากลางวัตถุดิบค้าส่งเฉลี่ย (บาทต่อกิโลกรัม)
@@ -58,19 +63,15 @@ with tab1:
 with tab2:
     st.write("#### เลือกปริมาณและขนาดเสิร์ฟแยกแต่ละเมนู")
     
-    # 💡 เพิ่มกล่องข้อความ Tips & Guidelines บอกน้ำหนักถาดเฉลี่ยหน้าร้านอย่างชัดเจนด้านบนสุด
     st.info("""
     💡 **คู่มือกะน้ำหนักถาดบุฟเฟต์ทั่วไป (สำหรับใช้ตัดสินใจกรอกข้อมูล):**
-    * 🔲 **ถาดคอนโดชาบูมาตรฐาน:** น้ำหนักอาหารเฉพาะเนื้อสัตว์/ของสดจะอยู่ที่ประมาณ **40 - 50 กรัม** ต่อถาด
-    * 🍽️ **จานเปลไซส์กลาง:** น้ำหนักอาหารเฉพาะเนื้อสัตว์/ของสดจะอยู่ที่ประมาณ **100 - 150 กรัม** ต่อจาน
+    * 🔲 **ถาดคอนโดชาบูมาตรฐาน:** น้ำหนักอาหารเฉพาะเนื้อสัตว์จะอยู่ที่ประมาณ **40 - 50 กรัม** ต่อถาด
+    * 🍽️ **จานเปลไซส์กลาง:** น้ำหนักอาหารเฉพาะเนื้อสัตว์จะอยู่ที่ประมาณ **100 - 150 กรัม** ต่อจาน
     * 🥗 **จานพูน/ชุดเปิดโต๊ะจานใหญ่:** น้ำหนักอาหารรวมจะอยู่ที่ประมาณ **250 - 300 กรัม** ต่อจาน
-    * 🍢 **ลูกชิ้น/ของแปรรูป:** 1 ลูกทั่วไปจะหนักประมาณ **15 - 20 กรัม** (กิน 5 ลูกเท่ากับประมาณ 100 กรัม)
     """)
     
-    # ตัวแปลงขนาดจานเป็นกรัมสากล
     size_map = {"เล็ก (~45g)": 45, "กลาง (~120g)": 120, "ใหญ่ (~280g)": 280}
     
-    # ฟังก์ชันผู้ช่วยสร้างช่องกรอกข้อมูลแบบแยกคอลัมน์อิสระ
     def menu_item_row(key_prefix, label_name):
         c_left, c_right = st.columns()
         with c_left:
@@ -79,14 +80,12 @@ with tab2:
             qty = st.number_input(f"จำนวนจาน:", min_value=0, value=0, key=f"qty_{key_prefix}")
         return qty * size_map[sz]
 
-    # --- หมวดเนื้อวัว ---
     with st.expander("🥩 หมวดเนื้อวัว (แยกขนาดจานได้อิสระ)", expanded=False):
         g_brisket = menu_item_row("brisket", "เนื้อบริสเกต")
         g_baipai = menu_item_row("baipai", "เนื้อไบพาย")
         g_nonglai = menu_item_row("nonglai", "เนื้อน่องลาย")
         g_sabainang = menu_item_row("sabainang", "สไบนาง")
 
-    # --- หมวดเนื้อหมู ---
     with st.expander("🐖 หมวดเนื้อหมู (แยกขนาดจานได้อิสระ)", expanded=False):
         g_samchan = menu_item_row("samchan", "หมูสามชั้นสไลด์")
         g_sankor = menu_item_row("sankor", "สันคอหมูสไลด์")
@@ -191,15 +190,17 @@ if st.button("🚀 ประมวลผลความคุ้มค่าร�
     grand_eaten_value = v_beef + v_pork + v_chicken_lava + v_eggs + v_duck + v_seafood + v_wonton + v_processed + v_veg + v_lines
     final_ratio = (grand_eaten_value / total_buffet_cost) * 100
     
+    # 🎨 3. ตกแต่งสีสันของกล่องข้อความสรุปผลลัพธ์ให้ดูเด่นและตื่นตาตื่นใจขึ้นด้วย HTML
     if final_ratio >= 130:
-        st.success(f"👑 ระดับ: สุดยอดนักกินล้างบางตู้ชาบู! ({final_ratio:.1f}%)")
+        st.markdown(f"<div style='background-color: #d4edda; padding: 15px; border-radius: 8px; border-left: 5px solid #28a745;'><h4 style='color: #155724; margin: 0;'>👑 ระดับ: สุดยอดนักกินล้างบางตู้ชาบู! ({final_ratio:.1f}%)</h4></div>", unsafe_allow_html=True)
     elif final_ratio >= 100:
-        st.info(f"🟢 ระดับ: มหาเศรษฐีบุฟเฟต์คืนทุนตัวจริง ({final_ratio:.1f}%)")
+        st.markdown(f"<div style='background-color: #d1ecf1; padding: 15px; border-radius: 8px; border-left: 5px solid #17a2b8;'><h4 style='color: #0c5460; margin: 0;'>🟢 ระดับ: มหาเศรษฐีบุฟเฟต์คืนทุนตัวจริง ({final_ratio:.1f}%)</h4></div>", unsafe_allow_html=True)
     elif final_ratio >= 65:
-        st.warning(f"🟡 ระดับ: อิ่มแปล้เน้นรักษาสุขภาพทางใจ ({final_ratio:.1f}%)")
+        st.markdown(f"<div style='background-color: #fff3cd; padding: 15px; border-radius: 8px; border-left: 5px solid #ffc107;'><h4 style='color: #856404; margin: 0;'>🟡 ระดับ: อิ่มแปล้เน้นรักษาสุขภาพทางใจ ({final_ratio:.1f}%)</h4></div>", unsafe_allow_html=True)
     else:
-        st.error(f"🔴 ระดับ: สมาคมผู้บริจาคกำไรให้ร้านค้า ({final_ratio:.1f}%)")
+        st.markdown(f"<div style='background-color: #f8d7da; padding: 15px; border-radius: 8px; border-left: 5px solid #dc3545;'><h4 style='color: #721c24; margin: 0;'>🔴 ระดับ: สมาคมผู้บริจาคกำไรให้ร้านค้า ({final_ratio:.1f}%)</h4></div>", unsafe_allow_html=True)
 
+    st.write("")
     c_m1, c_m2 = st.columns(2)
     c_m1.metric(label="ค่าหัวเน็ตสุทธิรวม VAT", value=f"{total_buffet_cost:.2f} บาท")
     c_m2.metric(label="มูลค่าอาหารรวมตามราคาตลาดสด", value=f"{grand_eaten_value:.2f} บาท", delta=f"{grand_eaten_value - total_buffet_cost:.2f} บาท")
