@@ -8,9 +8,8 @@ st.set_page_config(page_title="Buffet Master Premium", page_icon="🍲", layout=
 st.markdown("<h1 style='text-align: center; color: #FF4B4B; font-size: 38px;'>🍲 Buffet Master Premium 🥓</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #FFA500; font-weight: bold; font-size: 16px;'>🔥 ระบบคำนวณความคุ้มค่านาทีต่อนาที โฉมใหม่มีชีวิตชีวา! 🔥</p>", unsafe_allow_html=True)
 
-# 📸 แก้ไขรูปภาพ: เปลี่ยนมาใช้ลิงก์สำรองของ Wikimedia Commons ที่มีความเสถียรสูงสุดและระบบคลาวด์ไม่บล็อกชัวร์ 100%
-st.image("https://wikimedia.org", 
-         caption="🥢 กินให้อิ่ม ทานให้คุ้ม ตรวจสอบมูลค่าสด ๆ ได้ที่นี่เลย!", use_container_width=True)
+# 📸 รูปภาพหน้าปกหลัก (หากคุณมีภาพหน้าปก สามารถเปลี่ยนจาก shabu.jpg เป็นชื่อรูปของคุณได้ครับ)
+st.image("shabu.jpg", caption="🥢 กินให้อิ่ม ทานให้คุ้ม ตรวจสอบมูลค่าสด ๆ ได้ที่นี่เลย!", use_container_width=True)
 st.markdown("---")
 
 # ฟังก์ชันราคากลางวัตถุดิบค้าส่งเฉลี่ย (บาทต่อกิโลกรัม)
@@ -63,12 +62,9 @@ with tab1:
 with tab2:
     st.write("#### เลือกปริมาณและขนาดเสิร์ฟแยกแต่ละเมนู")
     
-    # 💡 ปรับแต่งข้อความคู่มือแถบสีฟ้าด้านบนให้อ่านสแกนง่ายขึ้นเป็นระเบียบเรียบร้อยบนมือถือ
     st.info("""
     💡 **คู่มือกะน้ำหนักถาดสากลหน้าร้านบุฟเฟต์:**
-    * 🔲 **ถาดคอนโดชาบูทั่วไป** = 40-50 กรัม
-    * 🍽️ **จานเปลไซส์กลาง** = 120 กรัม
-    * 🥗 **จานเปลใหญ่/เปิดโต๊ะ** = 280 กรัม
+    * 🔲 **ถาดคอนโดชาบูทั่วไป** = 40-50 กรัม | 🍽️ **จานเปลไซส์กลาง** = 120 กรัม | 🥗 **จานเปลใหญ่** = 280 กรัม
     """)
     
     size_map = {"เล็ก (~45g)": 45, "กลาง (~120g)": 120, "ใหญ่ (~280g)": 280}
@@ -81,7 +77,9 @@ with tab2:
             qty = st.number_input(f"จำนวนจาน:", min_value=0, value=0, key=f"qty_{key_prefix}")
         return qty * size_map[sz]
 
+    # 👑 ฝังรูปภาพ beef.jpg เข้าไปในหมวดเนื้อวัวโดยใช้โค้ดสั่งงานโดยตรง
     with st.expander("🥩 หมวดเนื้อวัวพรีเมียม (Premium Beef)", expanded=False):
+        st.image("beef.jpg", caption="เนื้อวัวสไลด์พรีเมียม", use_container_width=True)
         g_brisket = menu_item_row("brisket", "เนื้อบริสเกต")
         g_baipai = menu_item_row("baipai", "เนื้อไบพาย")
         g_nonglai = menu_item_row("nonglai", "เนื้อน่องลาย")
