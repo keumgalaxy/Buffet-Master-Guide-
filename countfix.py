@@ -2,17 +2,13 @@ import streamlit as st
 import random
 
 # ตั้งค่าหน้าเว็บสไตล์โมเดิร์น
-st.set_page_config(page_title="Buffet Master Wizard", page_icon="🍲", layout="centered")
+st.set_page_config(page_title="Buffet Master Steps", page_icon="🍲", layout="centered")
 
-# ระบบความจำชั่วคราว (Session State) จดจำหน้าปัจจุบัน
-if "current_step" not in st.session_state:
-    st.session_state.current_step = 1
-
-# หัวข้อหลักบนหน้าจอมือถือ
-st.markdown("<h1 style='text-align: center; color: #FF4B4B; font-size: 36px;'>🍲 Buffet Master Premium 🥓</h1>", unsafe_allow_html=True)
+# หัวข้อหลักของแอปพลิเคชัน
+st.markdown("<h1 style='text-align: center; color: #FF4B4B; font-size: 38px;'>🍲 Buffet Master Pro 🥓</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
-# 🛠️ ซ่อมแซมจุดนี้: เปลี่ยนคีย์ราคากลางให้เป็นภาษาไทยตรงตัว ป้องกัน KeyError 100%
+# ฟังก์ชันดึงฐานราคากลางวัตถุดิบค้าส่งอัปเดตปี 2026 (บาทต่อกิโลกรัม)
 def fetch_mega_market_prices():
     return {
         "เนื้อบริสเกต": round(random.uniform(260.0, 320.0), 2),
@@ -51,32 +47,56 @@ def fetch_mega_market_prices():
         "เส้นบะหมี่กึ่ง": round(random.uniform(40.0, 55.0), 2)
     }
 
-size_map = {"เล็ก (~45g)": 45, "กลาง (~120g)": 120, "ใหญ่ (~280g)": 280}
+# 🧠 ตั้งค่าระบบความจำชั่วคราวส่วนกลาง ป้องกันตัวแปรหายเวลาเปลี่ยนหน้า
+if "step" not in st.session_state:
+    st.session_state.step = 1
+if "g_items" not in st.session_state:
+    st.session_state.g_items = {}
 
-def menu_item_row(key_prefix, label_name):
-    c_left, c_right = st.columns(2)
-    with c_left:
-        sz = st.selectbox(f"ไซส์ {label_name}:", ["เล็ก (~45g)", "กลาง (~120g)", "ใหญ่ (~280g)"], key=f"sz_{key_prefix}")
-    with c_right:
-        qty = st.number_input(f"จำนวนจาน:", min_value=0, value=0, key=f"qty_{key_prefix}")
-    return qty * size_map[sz]
-
-# --- หน้าที่ 1: กรอกราคาหัว ---
-if st.session_state.current_step == 1:
+# --- STEP 1: หน้าตั้งค่าราคาร้าน ---
+if st.session_state.step == 1:
+    st.write("### 💰 ขั้นตอนที่ 1: ตั้งค่าราคาร้าน")
     st.image("cover.png", use_container_width=True)
-    st.write("### 💰 ขั้นตอนที่ 1: กรอกข้อมูลราคาร้าน")
-    raw_price = st.number_input("ราคาหัวบุฟเฟต์หน้าร้าน (บาท):", min_value=0.0, value=399.0, step=10.0, key="wizard_raw_price")
-    is_vat = st.toggle("ราคานี้ยังไม่รวม VAT 7%", value=True, key="wizard_is_vat")
-    st.write("")
-    if st.button("➡️ ไปเลือกรายการอาหาร", type="primary", use_container_width=True):
-        st.session_state.current_step = 2
-        st.rerun()
-# --- หน้าที่ 2: บันทึกรายการอาหาร ---
-elif st.session_state.current_step == 2:
-    st.write("### 🥢 ขั้นตอนที่ 2: บันทึกรายการอาหารที่กิน")
-    st.info("💡 **คู่มือกะน้ำหนักถาดสากล:** ถาดคอนโดชาบู = 40-50g | จานเปลกลาง = 120g | จานใหญ่ = 280g")
     
+    default_price = st.session_state.get('raw_price', 399.0)
+    default_vat = st.session_state.get('is_vat', True)
+    
+    raw_price = st.number_input("ราคาหัวบุฟเฟต์หน้าร้าน (บาท):", min_value=0.0, value=default_price, step=10.0)
+    is_vat = st.toggle("ราคานี้ยังไม่รวม VAT 7%", value=default_vat)
+    
+    st.session_state.raw_price = raw_price
+    st.session_state.is_vat = is_vat
+    st.session_state.total_buffet_cost = raw_price * 1.07 if is_vat else raw_price
+    
+    st.write("")
+    if st.button("ถัดไป: เลือกเมนูอาหาร ➡️", type="primary", use_container_width=True):
+        st.session_state.step = 2
+        st.rerun()
+# --- STEP 2: หน้าเลือกรายการอาหาร ---
+elif st.session_state.step == 2:
+    st.write("### 🥢 ขั้นตอนที่ 2: รายการอาหารที่คุณทาน")
+    
+    st.info("""
+    💡 **คู่มือกะน้ำหนักถาดสากลหน้าร้านบุฟเฟต์:**
+    * 🔲 **ถาดคอนโดชาบูทั่วไป** = 40-50 กรัม | 🍽️ **จานเปลไซส์กลาง** = 120 กรัม | 🥗 **จานเปลใหญ่** = 280 กรัม
+    """)
+    
+    size_map = {"เล็ก (~45g)": 45, "กลาง (~120g)": 120, "ใหญ่ (~280g)": 280}
+    
+    def menu_item_row(key_prefix, label_name):
+        c_left, c_right = st.columns(2)
+        with c_left:
+            default_sz_idx = 0
+            if f"sz_{key_prefix}" in st.session_state:
+                default_sz_idx = ["เล็ก (~45g)", "กลาง (~120g)", "ใหญ่ (~280g)"].index(st.session_state[f"sz_{key_prefix}"])
+            sz = st.selectbox(f"ขนาด {label_name}:", ["เล็ก (~45g)", "กลาง (~120g)", "ใหญ่ (~280g)"], index=default_sz_idx, key=f"sz_{key_prefix}")
+        with c_right:
+            default_qty = st.session_state.get(f"qty_{key_prefix}", 0)
+            qty = st.number_input(f"จำนวนจาน:", min_value=0, value=default_qty, key=f"qty_{key_prefix}")
+        return qty * size_map[sz]
+
     with st.expander("🥩 หมวดเนื้อวัวพรีเมียม (แยกจานอิสระ)", expanded=True):
+        st.image("beef.jpg", use_container_width=True)
         g_brisket = menu_item_row("brisket", "เนื้อบริสเกต")
         g_baipai = menu_item_row("baipai", "เนื้อไบพาย")
         g_nonglai = menu_item_row("nonglai", "เนื้อน่องลาย")
@@ -89,111 +109,133 @@ elif st.session_state.current_step == 2:
         g_sai_moo = menu_item_row("saimoo", "ไส้หมู")
 
     with st.expander("🐓 เมนูไก่และไข่", expanded=False):
-        g_chicken_lava = st.number_input("ไก่ลาวา (กรัม):", min_value=0, value=0, step=50, key="w_chicken_lava")
-        pcs_egg = st.number_input("ไข่ไก่ (จำนวนฟอง):", min_value=0, value=0, step=1, key="w_pcs_egg")
+        g_chicken_lava = st.number_input("ไก่ลาวา (กรัม):", min_value=0, value=st.session_state.get("chicken_lava_val", 0), step=50, key="chicken_lava_val")
+        pcs_egg = st.number_input("ไข่ไก่ (จำนวนฟอง):", min_value=0, value=st.session_state.get("pcs_egg_val", 0), step=1, key="pcs_egg_val")
 
     with st.expander("🦆 เมนูเป็ด", expanded=False):
-        g_sai_ped = st.number_input("ไส้เป็ด (กรัม):", min_value=0, value=0, step=50, key="w_sai_ped")
+        g_sai_ped = st.number_input("ไส้เป็ด (กรัม):", min_value=0, value=st.session_state.get("sai_ped_val", 0), step=50, key="sai_ped_val")
 
     with st.expander("🦐 เมนูซีฟู๊ด", expanded=False):
-        g_shrimp = st.number_input("กุ้ง (กรัม):", min_value=0, value=0, step=50, key="w_shrimp")
-        g_squid = st.number_input("ปลาหมึก (กรัม):", min_value=0, value=0, step=50, key="w_squid")
-        g_jellyfish = st.number_input("แมงกะพรุน (กรัม):", min_value=0, value=0, step=50, key="w_jellyfish")
-        g_crispy_squid = st.number_input("ปลาหมึกกรอบ (กรัม):", min_value=0, value=0, step=50, key="w_crispy_squid")
+        g_shrimp = st.number_input("กุ้ง (กรัม):", min_value=0, value=st.session_state.get("shrimp_val", 0), step=50, key="shrimp_val")
+        g_squid = st.number_input("ปลาหมึก (กรัม):", min_value=0, value=st.session_state.get("squid_val", 0), step=50, key="squid_val")
+        g_jellyfish = st.number_input("แมงกะพรุน (กรัม):", min_value=0, value=st.session_state.get("jellyfish_val", 0), step=50, key="jellyfish_val")
+        g_crispy_squid = st.number_input("ปลาหมึกกรอบ (กรัม):", min_value=0, value=st.session_state.get("crispy_squid_val", 0), step=50, key="crispy_squid_val")
 
     with st.expander("🥟 เมนูเกี๊ยว", expanded=False):
-        g_spinach_cheese = st.number_input("เกี๊ยวผักโขมอบชีส (กรัม):", min_value=0, value=0, step=50, key="w_spinach_cheese")
-        g_pork_wonton = st.number_input("เกี๊ยวหมู (กรัม):", min_value=0, value=0, step=50, key="w_pork_wonton")
+        g_spinach_cheese = st.number_input("เกี๊ยวผักโขมอบชีส (กรัม):", min_value=0, value=st.session_state.get("spinach_cheese_val", 0), step=50, key="spinach_cheese_val")
+        g_pork_wonton = st.number_input("เกี๊ยวหมู (กรัม):", min_value=0, value=st.session_state.get("pork_wonton_val", 0), step=50, key="pork_wonton_val")
 
     with st.expander("🍥 เมนูของแปรรูป", expanded=False):
-        g_crab = st.number_input("ปูอัด (กรัม):", min_value=0, value=0, step=50, key="w_crab")
-        g_lookchin_moo = st.number_input("ลูกชิ้นหมู (กรัม):", min_value=0, value=0, step=30, key="w_lookchin_moo")
-        g_lookchin_neua = st.number_input("ลูกชิ้นเนื้อ (กรัม):", min_value=0, value=0, step=30, key="w_lookchin_neua")
-        g_lookchin_pla = st.number_input("ลูกชิ้นปลา (กรัม):", min_value=0, value=0, step=30, key="w_lookchin_pla")
-        g_sausage = st.number_input("ไส้กรอกไก่ (กรัม):", min_value=0, value=0, step=30, key="w_sausage")
-        g_tofu_egg = st.number_input("เต้าหู้ไข่ (กรัม):", min_value=0, value=0, step=30, key="w_tofu_egg")
-        g_tofu_pla = st.number_input("เต้าหู้ปลา (กรัม):", min_value=0, value=0, step=30, key="w_tofu_pla")
-        g_tofu_cheese = st.number_input("เต้าหู้ชีส (กรัม):", min_value=0, value=0, step=30, key="w_tofu_cheese")
-        g_chikuwa_cheese = st.number_input("ชิกุว่าไส้ชีส (กรัม):", min_value=0, value=0, step=30, key="w_chikuwa_cheese")
+        g_crab = st.number_input("ปูอัด (กรัม):", min_value=0, value=st.session_state.get("crab_val", 0), step=50, key="crab_val")
+        g_lookchin_moo = st.number_input("ลูกชิ้นหมู (กรัม):", min_value=0, value=st.session_state.get("lookchin_moo_val", 0), step=30, key="lookchin_moo_val")
+        g_lookchin_neua = st.number_input("ลูกชิ้นเนื้อ (กรัม):", min_value=0, value=st.session_state.get("lookchin_neua_val", 0), step=30, key="lookchin_neua_val")
+        g_lookchin_pla = st.number_input("ลูกชิ้นปลา (กรัม):", min_value=0, value=st.session_state.get("lookchin_pla_val", 0), step=30, key="lookchin_pla_val")
+        g_sausage = st.number_input("ไส้กรอกไก่ (กรัม):", min_value=0, value=st.session_state.get("sausage_val", 0), step=30, key="sausage_val")
+        g_tofu_egg = st.number_input("เต้าหู้ไข่ (กรัม):", min_value=0, value=st.session_state.get("tofu_egg_val", 0), step=30, key="tofu_egg_val")
+        g_tofu_pla = st.number_input("เต้าหู้ปลา (กรัม):", min_value=0, value=st.session_state.get("tofu_pla_val", 0), step=30, key="tofu_pla_val")
+        g_tofu_cheese = st.number_input("เต้าหู้ชีส (กรัม):", min_value=0, value=st.session_state.get("tofu_cheese_val", 0), step=30, key="tofu_cheese_val")
+        g_chikuwa_cheese = st.number_input("ชิกุว่าไส้ชีส (กรัม):", min_value=0, value=st.session_state.get("chikuwa_cheese_val", 0), step=30, key="chikuwa_cheese_val")
 
     with st.expander("🥬 เมนูผักสวนครัว", expanded=False):
-        use_veg_set = st.checkbox("🔄 ฉันเลือกทานเป็น 'ชุดผักรวม'", value=False, key="w_use_veg_set")
+        use_veg_set = st.checkbox("🔄 ฉันเลือกทานเป็น 'ชุดผักรวม'", value=st.session_state.get("use_veg_set_val", False), key="use_veg_set_val")
         if use_veg_set:
-            g_veg_set = st.number_input("ปริมาณชุดผักรวมทั้งหมด (กรัม):", min_value=0, value=200, step=50, key="w_g_veg_set")
+            g_veg_set = st.number_input("ปริมาณชุดผักรวมทั้งหมด (กรัม):", min_value=0, value=st.session_state.get("veg_set_val", 200), step=50, key="veg_set_val")
             g_osun = g_kard = g_bung = g_kana = g_kablam = g_kwangtung = g_khunchai = g_needle = g_orinj = g_shii = g_carrot = g_radish = 0
         else:
             g_veg_set = 0
             c_v1, c_v2 = st.columns(2)
             with c_v1:
-                g_osun = st.number_input("ผักโอซุ่น (กรัม):", min_value=0, value=0, step=20, key="w_g_osun")
-                g_kard = st.number_input("ผักกาด (กรัม):", min_value=0, value=0, step=20, key="w_g_kard")
-                g_bung = st.number_input("ผักบุ้ง (กรัม):", min_value=0, value=0, step=20, key="w_g_bung")
-                g_kana = st.number_input("ผักคะน้า (กรัม):", min_value=0, value=0, step=20, key="w_g_kana")
-                g_kablam = st.number_input("ผักกะหล่ำ (กรัม):", min_value=0, value=0, step=20, key="w_g_kablam")
-                g_kwangtung = st.number_input("ผักกวางตุ้ง (กรัม):", min_value=0, value=0, step=20, key="w_g_kwangtung")
+                g_osun = st.number_input("ผักโอซุ่น (กรัม):", min_value=0, value=st.session_state.get("osun_val", 0), step=20, key="osun_val")
+                g_kard = st.number_input("ผักกาด (กรัม):", min_value=0, value=st.session_state.get("kard_val", 0), step=20, key="kard_val")
+                g_bung = st.number_input("ผักบุ้ง (กรัม):", min_value=0, value=st.session_state.get("bung_val", 0), step=20, key="bung_val")
+                g_kana = st.number_input("ผักคะน้า (กรัม):", min_value=0, value=st.session_state.get("kana_val", 0), step=20, key="kana_val")
+                g_kablam = st.number_input("ผักกะหล่ำ (กรัม):", min_value=0, value=st.session_state.get("kablam_val", 0), step=20, key="kablam_val")
+                g_kwangtung = st.number_input("ผักกวางตุ้ง (กรัม):", min_value=0, value=st.session_state.get("kwangtung_val", 0), step=20, key="kwangtung_val")
             with c_v2:
-                g_khunchai = st.number_input("ผักคื่นช่าย (กรัม):", min_value=0, value=0, step=10, key="w_g_khunchai")
-                g_needle = st.number_input("เห็ดเข็มทอง (กรัม):", min_value=0, value=0, step=20, key="w_g_needle")
-                g_orinj = st.number_input("เห็ดออรินจิ (กรัม):", min_value=0, value=0, step=20, key="w_g_orinj")
-                g_shii = st.number_input("เห็ดหอม (กรัม):", min_value=0, value=0, step=20, key="w_g_shii")
-                g_carrot = st.number_input("แครอท (กรัม):", min_value=0, value=0, step=20, key="w_g_carrot")
-                g_radish = st.number_input("หัวไชเท้า (กรัม):", min_value=0, value=0, step=20, key="w_g_radish")
+                g_khunchai = st.number_input("ผักคื่นช่าย (กรัม):", min_value=0, value=st.session_state.get("khunchai_val", 0), step=10, key="khunchai_val")
+                g_needle = st.number_input("เห็ดเข็มทอง (กรัม):", min_value=0, value=st.session_state.get("needle_val", 0), step=20, key="needle_val")
+                g_orinj = st.number_input("เห็ดออรินจิ (กรัม):", min_value=0, value=st.session_state.get("orinj_val", 0), step=20, key="orinj_val")
+                g_shii = st.number_input("เห็ดหอม (กรัม):", min_value=0, value=st.session_state.get("shii_val", 0), step=20, key="shii_val")
+                g_carrot = st.number_input("แครอท (กรัม):", min_value=0, value=st.session_state.get("carrot_val", 0), step=20, key="carrot_val")
+                g_radish = st.number_input("หัวไชเท้า (กรัม):", min_value=0, value=st.session_state.get("radish_val", 0), step=20, key="radish_val")
 
     with st.expander("🍜 เมนูเส้นประหยัดท้อง", expanded=False):
-        g_n_normal = st.number_input("เส้นบะหมี่ (กรัม):", min_value=0, value=0, step=30, key="w_g_n_normal")
-        g_n_jade = st.number_input("เส้นบะหมี่หยก (กรัม):", min_value=0, value=0, step=30, key="w_g_n_jade")
-        g_n_mee = st.number_input("เส้นหมี่ (กรัม):", min_value=0, value=0, step=30, key="w_g_n_mee")
-        g_glass = st.number_input("วุ้นเส้น (กรัม):", min_value=0, value=0, step=30, key="w_g_glass")
-        g_sticky = st.number_input("เส้นมันหนึบ (กรัม):", min_value=0, value=0, step=30, key="w_g_sticky")
-        g_instant = st.number_input("เส้นบะหมี่กึ่ง (กรัม):", min_value=0, value=0, step=30, key="w_g_instant")
-        
+        g_n_normal = st.number_input("เส้นบะหมี่ (กรัม):", min_value=0, value=st.session_state.get("n_normal_val", 0), step=30, key="n_normal_val")
+        g_n_jade = st.number_input("เส้นบะหมี่หยก (กรัม):", min_value=0, value=st.session_state.get("n_jade_val", 0), step=30, key="n_jade_val")
+        g_n_mee = st.number_input("เส้นหมี่ (กรัม):", min_value=0, value=st.session_state.get("n_mee_val", 0), step=30, key="n_mee_val")
+        g_glass = st.number_input("วุ้นเส้น (กรัม):", min_value=0, value=st.session_state.get("glass_val", 0), step=30, key="glass_val")
+        g_sticky = st.number_input("เส้นมันหนึบ (กรัม):", min_value=0, value=st.session_state.get("sticky_val", 0), step=30, key="sticky_val")
+        g_instant = st.number_input("เส้นบะหมี่กึ่ง (กรัม):", min_value=0, value=st.session_state.get("instant_val", 0), step=30, key="instant_val")
+
+    # 👑 ฝากค่าน้ำหนักของทุกอย่างลงตู้เซฟความจำส่วนกลางอย่างเป็นระบบ
+    st.session_state.g_items = {
+        "brisket": g_brisket, "baipai": g_baipai, "nonglai": g_nonglai, "sabainang": g_sabainang,
+        "samchan": g_samchan, "sankor": g_sankor, "maipai": g_maipai, "saimoo": g_sai_moo,
+        "chicken_lava": g_chicken_lava, "pcs_egg": pcs_egg, "sai_ped": g_sai_ped,
+        "shrimp": g_shrimp, "squid": g_squid, "jellyfish": g_jellyfish, "crispy_squid": g_crispy_squid,
+        "spinach_cheese": g_spinach_cheese, "pork_wonton": g_pork_wonton, "crab": g_crab,
+        "lookchin_moo": g_lookchin_moo, "lookchin_neua": g_lookchin_neua, "lookchin_pla": g_lookchin_pla,
+        "sausage": g_sausage, "tofu_egg": g_tofu_egg, "tofu_pla": g_tofu_pla, "tofu_cheese": g_tofu_cheese, "chikuwa_cheese": g_chikuwa_cheese,
+        "use_veg_set": use_veg_set, "veg_set": g_veg_set, "osun": g_osun, "kard": g_kard, "bung": g_bung, "kana": g_kana, "kablam": g_kablam, "kwangtung": g_kwangtung, "khunchai": g_khunchai, "needle": g_needle, "orinj": g_orinj, "shii": g_shii, "carrot": g_carrot, "radish": g_radish,
+        "n_normal": g_n_normal, "n_jade": g_n_jade, "n_mee": g_n_mee, "glass": g_glass, "sticky": g_sticky, "instant": g_instant
+    }
+
     st.write("")
     c_btn1, c_btn2 = st.columns(2)
     with c_btn1:
         if st.button("⬅️ ย้อนกลับไปหน้าแรก", use_container_width=True):
-            st.session_state.current_step = 1
+            st.session_state.step = 1
             st.rerun()
     with c_btn2:
-        if st.button("➡️ ไปหน้าสรุปความคุ้ม", type="primary", use_container_width=True):
-            st.session_state.current_step = 3
+        if st.button("ถัดไป: สรุปผลความคุ้ม ➡️", type="primary", use_container_width=True):
+            st.session_state.step = 3
             st.rerun()
-# --- หน้าที่ 3: สรุปรายงานวิเคราะห์ความคุ้มค่า ---
-elif st.session_state.current_step == 3:
-    st.write("### 🚀 ขั้นตอนที่ 3: สรุปผลความคุ้มค่าสุทธิของคุณ")
+# --- STEP 3: หน้าสรุปผลลัพธ์สุดท้ายโดดๆ ---
+elif st.session_state.step == 3:
+    st.write("### 🚀 ขั้นตอนที่ 3: สรุปผลลัพธ์ความคุ้มค่า")
     
+    total_buffet_cost = st.session_state.get('total_buffet_cost', 399.0)
+    g = st.session_state.get('g_items', {})
     prices = fetch_mega_market_prices()
-    r_price = st.session_state.get("wizard_raw_price", 399.0)
-    v_toggle = st.session_state.get("wizard_is_vat", True)
-    total_buffet_cost = r_price * 1.07 if v_toggle else r_price
     
-    v_beef = ((g_brisket * prices["เนื้อบริสเกต"]) + (g_baipai * prices["เนื้อไบพาย"]) + 
-              (g_nonglai * prices["เนื้อน่องลายสไลด์"]) + (g_sabainang * prices["สไบนาง"])) / 1000
-    v_pork = ((g_samchan * prices["หมูสามชั้นสไลด์"]) + (g_sankor * prices["สันคอหมูสไลด์"]) + 
-              (g_maipai * prices["หมูไม้ไผ่"]) + (g_sai_moo * prices["ไ้ส้หมู"])) / 1000
-    v_chicken_lava = ((g_chicken_lava * prices["เนื้อไก่ดิบ"]) / 1000) + ((g_chicken_lava / 100) * prices["ไข่ไก่"])
-    v_eggs = pcs_egg * prices["ไข่ไก่"]
-    v_duck = (g_sai_ped * prices["ไส้เป็ด"]) / 1000
-    v_seafood = ((g_shrimp * prices["กุ้ง"]) + (g_squid * prices["ปลาหมึก"]) + 
-                 (g_jellyfish * prices["แมงกะพรุน"]) + (g_crispy_squid * prices["ปลาหมึกกรอบ"])) / 1000
-    v_wonton = ((g_spinach_cheese * prices["เกี๊ยวผักโขมอบชีส"]) + (g_pork_wonton * prices["เกี๊ยวหมู"])) / 1000
-    v_processed = ((g_crab * prices["ปูอัด"]) + (g_lookchin_moo * prices["ลูกชิ้นหมู"]) + 
-                   (g_lookchin_neua * prices["ลูกชิ้นเนื้อ"]) + (g_lookchin_pla * prices["ลูกชิ้นปลา"]) + 
-                   (g_sausage * prices["ไส้กรอกไก่"]) + (g_tofu_egg * prices["เต้าหู้ไข่"]) + 
-                   (g_tofu_pla * prices["เต้าหู้ปลา"]) + (g_tofu_cheese * prices["เต้าหู้ชีส"]) + 
-                   (g_chikuwa_cheese * prices["ชิกุว่าไส้ชีส"])) / 1000
-    if use_veg_set:
-        v_veg = (g_veg_set * prices["ชุดผักรวม"]) / 1000
+    # ดึงค่าน้ำหนักผ่านตู้เซฟกลางทั้งหมด แก้บั๊ก NameError ได้เบ็ดเสร็จเด็ดขาด
+    v_beef = ((g.get("brisket", 0) * prices["เนื้อบริสเกต"]) + (g.get("baipai", 0) * prices["เนื้อไบพาย"]) + 
+              (g.get("nonglai", 0) * prices["เนื้อน่องลายสไลด์"]) + (g.get("sabainang", 0) * prices["สไบนาง"])) / 1000
+              
+    v_pork = ((g.get("samchan", 0) * prices["หมูสามชั้นสไลด์"]) + (g.get("sankor", 0) * prices["สันคอหมูสไลด์"]) + 
+              (g.get("maipai", 0) * prices["หมูไม้ไผ่"]) + (g.get("saimoo", 0) * prices["ไ้ส้หมู"])) / 1000
+              
+    v_chicken_lava = ((g.get("chicken_lava", 0) * prices["เนื้อไก่ดิบ"]) / 1000) + ((g.get("chicken_lava", 0) / 100) * prices["ไข่ไก่"])
+    v_eggs = g.get("pcs_egg", 0) * prices["ไข่ไก่"]
+    v_duck = (g.get("sai_ped", 0) * prices["ไส้เป็ด"]) / 1000
+    
+    v_seafood = ((g.get("shrimp", 0) * prices["กุ้ง"]) + (g.get("squid", 0) * prices["ปลาหมึก"]) + 
+                 (g.get("jellyfish", 0) * prices["แมงกะพรุน"]) + (g.get("crispy_squid", 0) * prices["ปลาหมึกกรอบ"])) / 1000
+                 
+    v_wonton = ((g.get("spinach_cheese", 0) * prices["เกี๊ยวผักโขมอบชีส"]) + (g.get("pork_wonton", 0) * prices["เกี๊ยวหมู"])) / 1000
+    
+    v_processed = ((g.get("crab", 0) * prices["ปูอัด"]) + (g.get("lookchin_moo", 0) * prices["ลูกชิ้นหมู"]) + 
+                   (g.get("lookchin_neua", 0) * prices["ลูกชิ้นเนื้อ"]) + (g.get("lookchin_pla", 0) * prices["ลูกชิ้นปลา"]) + 
+                   (g.get("sausage", 0) * prices["ไส้กรอกไก่"]) + (g.get("tofu_egg", 0) * prices["เต้าหู้ไข่"]) + 
+                   (g.get("tofu_pla", 0) * prices["เต้าหู้ปลา"]) + (g.get("tofu_cheese", 0) * prices["เต้าหู้ชีส"]) + 
+                   (g.get("chikuwa_cheese", 0) * prices["ชิกุว่าไส้ชีส"])) / 1000
+                   
+    if g.get("use_veg_set", False):
+        v_veg = (g.get("veg_set", 0) * prices["ชุดผักรวม"]) / 1000
     else:
-        total_veg_g = g_osun + g_kard + g_bung + g_kana + g_kablam + g_kwangtung + g_khunchai + g_needle + g_orinj + g_shii + g_carrot + g_radish
+        total_veg_g = (g.get("osun", 0) + g.get("kard", 0) + g.get("bung", 0) + g.get("kana", 0) + g.get("kablam", 0) + 
+                       g.get("kwangtung", 0) + g.get("khunchai", 0) + g.get("needle", 0) + g.get("orinj", 0) + g.get("shii", 0) + 
+                       g.get("carrot", 0) + g.get("radish", 0))
         v_veg = (total_veg_g * prices["ผักเดี่ยว"]) / 1000
-    v_lines = ((g_n_normal * prices["เส้นบะหมี่"]) + (g_n_jade * prices["เส้นบะหมี่หยก"]) + 
-               (g_n_mee * prices["เส้นหมี่"]) + (g_glass * prices["วุ้นเส้น"]) + 
-               (g_sticky * prices["เส้นมันหนึบ"]) + (g_instant * prices["เส้นบะหมี่กึ่ง"])) / 1000
+        
+    v_lines = ((g.get("n_normal", 0) * prices["เส้นบะหมี่"]) + (g.get("n_jade", 0) * prices["เส้นบะหมี่หยก"]) + 
+               (g.get("n_mee", 0) * prices["เส้นหมี่"]) + (g.get("glass", 0) * prices["วุ้นเส้น"]) + 
+               (g.get("sticky", 0) * prices["เส้นมันหนึบ"]) + (g.get("instant", 0) * prices["เส้นบะหมี่กึ่ง"])) / 1000
 
     grand_eaten_value = v_beef + v_pork + v_chicken_lava + v_eggs + v_duck + v_seafood + v_wonton + v_processed + v_veg + v_lines
     final_ratio = (grand_eaten_value / total_buffet_cost) * 100
     
-    st.write("📊 **หลอดเกจระดับความคุ้มค่าของคุณ:**")
+    st.write("📊 **หลอดเกจแสดงระดับความคุ้มค่าของคุณ:**")
     st.progress(min(int(final_ratio), 100) / 100)
 
     if final_ratio >= 130:
@@ -215,18 +257,18 @@ elif st.session_state.current_step == 3:
     c_m1.metric(label="ค่าหัวเน็ตสุทธิรวม VAT", value=f"{total_buffet_cost:.2f} บาท")
     c_m2.metric(label="มูลค่าอาหารรวมตามราคาตลาดสด", value=f"{grand_eaten_value:.2f} บาท", delta=f"{grand_eaten_value - total_buffet_cost:.2f} บาท")
 
-    st.markdown("### 📋 สรุปผลการทาน (คลิกไอคอนขวาบนเพื่อคัดลอก)")
+    st.markdown("### 📋 สรุปรายงาน (คลิกไอคอนขวาบนเพื่อคัดลอกส่งไลน์)")
     summary_text = (
         f"📋 [รายงานความคุ้มค่าบุฟเฟต์]\n"
         f"💰 ราคาหน้าร้านสุทธิ: {total_buffet_cost:.2f} บาท\n"
         f"🥩 มูลค่าของสดที่กินจริง: {grand_eaten_value:.2f} บาท\n"
         f"📈 เปอร์เซ็นต์ความคุ้ม: {final_ratio:.1f}%\n"
         f"🏅 ผลประเมิน: {status_label}\n"
-        f"🤖 คำนวณผ่านแอป Buffet Master Premium"
+        f"🤖 คำนวณผ่านแอป Buffet Master Step-by-Step"
     )
     st.code(summary_text, language="text")
     
     st.write("")
     if st.button("⬅️ กลับไปแก้ไขรายการอาหาร", use_container_width=True):
-        st.session_state.current_step = 2
+        st.session_state.step = 2
         st.rerun()
